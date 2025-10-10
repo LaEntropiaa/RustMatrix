@@ -1,4 +1,5 @@
 use num_traits::{Num, NumAssign};
+use core::panic;
 use std::fmt::{self, Debug};
 use std::ops::Add;
 use std::ops::Sub;
@@ -66,6 +67,47 @@ impl<T: Num + NumAssign + fmt::Display + Copy + Eq + PartialEq + Debug> Matrix<T
         index += column;
         self.data[index] = data;
         return;
+    }
+    
+    pub fn exchange_rows(&mut self, row1: usize, row2: usize) -> () {
+        if row1 >= self.rows || row2 >= self.rows {
+            panic!("Row index is out of bounds.");
+        }
+
+        //Get copy of row2
+        let temp = self.get_row(row2);
+        let mut index1 = 0;
+        let mut index2 = 0;
+        //Move from row1 to row2
+        index1 += self.columns * row1;
+        index2 += self.columns * row2;
+        for i in 0..self.columns {
+            self.data[index2 + i] = self.data[index1 + i];
+            self.data[index1 + i] = temp[i]; 
+        }
+    }
+
+    pub fn get_determinant(&self) -> T {
+        if self.rows != self.columns {
+            panic!("Only nxn matrixes can have a determinant.");
+        }
+
+        let mut trig_matrix = Matrix {
+            columns: self.columns,
+            rows: self.rows,
+            data: self.data.clone(),
+        }; 
+        let mut sign = 1.0;
+        
+        for i in 0..self.columns {
+            let mut pivot = self.get(i, i);
+
+            if pivot.is_zero() {
+                break; //Skip if pivot is 
+            }
+        }
+
+        return self.data[0];
     }
 }
 
