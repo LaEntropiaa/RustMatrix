@@ -23,6 +23,9 @@ impl<T: Num + NumAssign + fmt::Display + Copy + Eq + PartialEq + Debug> Matrix<T
     }
 
     pub fn get(&self, row: usize, column: usize) -> &T {
+        if row >= self.rows || column >= self.columns {
+            panic!("Index given is out of range.")
+        }
         let mut index = 0;
         index += row * self.columns;
         index += column;
@@ -62,6 +65,9 @@ impl<T: Num + NumAssign + fmt::Display + Copy + Eq + PartialEq + Debug> Matrix<T
     }
 
     pub fn set(&mut self, row: usize, column: usize, data: T) -> () {
+        if row >= self.rows || column >= self.columns {
+            panic!("Index given is out of range.")
+        }
         let mut index = 0;
         index += row * self.columns;
         index += column;
@@ -87,6 +93,20 @@ impl<T: Num + NumAssign + fmt::Display + Copy + Eq + PartialEq + Debug> Matrix<T
         }
     }
 
+    pub fn exchange_columns(&mut self, column1: usize, column2: usize) -> () {
+        if column1 >= self.columns || column2 >= self.columns {
+            panic!("Column index is out of bounds.")
+        }
+
+        //Get copy of column2
+        let temp = self.get_column(column2);
+        for i in 0..self.rows {
+            self.data[column2 + (i * self.columns)] = self.data[column1 + (i * self.columns)];
+            self.data[column1 + (i * self.columns)] = temp[i];
+        }
+
+    }
+
     pub fn get_determinant(&self) -> T {
         if self.rows != self.columns {
             panic!("Only nxn matrixes can have a determinant.");
@@ -102,9 +122,11 @@ impl<T: Num + NumAssign + fmt::Display + Copy + Eq + PartialEq + Debug> Matrix<T
         for i in 0..self.columns {
             let mut pivot = self.get(i, i);
 
-            if pivot.is_zero() {
-                break; //Skip if pivot is 
-            }
+            // Assign x to next column
+            let mut x = i + 1;
+            while pivot.is_zero() && x < self.columns {
+
+            } 
         }
 
         return self.data[0];
@@ -402,5 +424,85 @@ mod tests {
         matrix1 = matrix1 * matrix2;
 
         assert_eq!(result_matrix, matrix1);
+    }
+
+    #[test]
+    fn exchange_rows_1() {
+        let mut matrix = Matrix::new(3, 4, 5);
+        matrix.set(0, 0, 1);
+        matrix.set(0, 1, 2);
+        matrix.set(0, 2, 3);
+        matrix.set(0, 3, 4);
+        matrix.set(1, 0, 5);
+        matrix.set(1, 1, 6);
+        matrix.set(1, 2, 7);
+        matrix.set(1, 3, 8);
+
+        matrix.exchange_rows(0, 1);
+
+        let row1 = vec![1, 2, 3, 4];
+        let row2 = vec![5, 6, 7, 8];
+
+        assert_eq!(row1, matrix.get_row(1));
+        assert_eq!(row2, matrix.get_row(0));
+    }
+    
+    #[test]
+    fn exchange_rows_2() {
+        let mut matrix = Matrix::new(3, 4, 5);
+        matrix.set(0, 0, 1);
+        matrix.set(0, 1, 2);
+        matrix.set(0, 2, 3);
+        matrix.set(0, 3, 4);
+        matrix.set(2, 0, 5);
+        matrix.set(2, 1, 6);
+        matrix.set(2, 2, 7);
+        matrix.set(2, 3, 8);
+
+        matrix.exchange_rows(0, 2);
+
+        let row1 = vec![1, 2, 3, 4];
+        let row2 = vec![5, 6, 7, 8];
+
+        assert_eq!(row1, matrix.get_row(2));
+        assert_eq!(row2, matrix.get_row(0));
+    }
+    
+    #[test]
+    fn exchange_columns_1() {
+        let mut matrix = Matrix::new(3, 4, 5);
+        matrix.set(0, 0, 1);
+        matrix.set(1, 0, 2);
+        matrix.set(2, 0, 3);
+        matrix.set(0, 1, 4);
+        matrix.set(1, 1, 5);
+        matrix.set(2, 1, 6);
+
+        matrix.exchange_columns(0, 1);
+
+        let column1 = vec![1, 2, 3];
+        let column2 = vec![4, 5, 6];
+
+        assert_eq!(column1, matrix.get_column(1));
+        assert_eq!(column2, matrix.get_column(0));
+    }
+
+    #[test]
+    fn exchange_columns_2() {
+        let mut matrix = Matrix::new(3, 4, 5);
+        matrix.set(0, 0, 1);
+        matrix.set(1, 0, 2);
+        matrix.set(2, 0, 3);
+        matrix.set(0, 3, 4);
+        matrix.set(1, 3, 5);
+        matrix.set(2, 3, 6);
+
+        matrix.exchange_columns(0, 3);
+
+        let column1 = vec![1, 2, 3];
+        let column2 = vec![4, 5, 6];
+
+        assert_eq!(column1, matrix.get_column(3));
+        assert_eq!(column2, matrix.get_column(0));
     }
 }
