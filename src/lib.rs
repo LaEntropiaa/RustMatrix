@@ -1,19 +1,39 @@
-use num_traits::{Num, NumAssign, Signed, Float};
 use core::panic;
+use num_traits::{Float, Num, NumAssign, Signed};
 use std::fmt::{self, Debug};
 use std::ops::Add;
-use std::ops::Sub;
 use std::ops::Mul;
-
+use std::ops::Sub;
 
 #[derive(PartialEq, Eq, Debug)]
-pub struct Matrix<T: Num + NumAssign + Signed + Float + fmt::Display + Copy+PartialEq + Debug + std::iter::Product<T>> {
+pub struct Matrix<
+    T: Num
+        + NumAssign
+        + Signed
+        + Float
+        + fmt::Display
+        + Copy
+        + PartialEq
+        + Debug
+        + std::iter::Product<T>,
+> {
     rows: usize,
     columns: usize,
     data: Vec<T>,
 }
 
-impl<T: Num + NumAssign + Signed + Float + fmt::Display + Copy+PartialEq + Debug + std::iter::Product<T>> Matrix<T> {
+impl<
+        T: Num
+            + NumAssign
+            + Signed
+            + Float
+            + fmt::Display
+            + Copy
+            + PartialEq
+            + Debug
+            + std::iter::Product<T>,
+    > Matrix<T>
+{
     pub fn new(rows: usize, columns: usize, default: T) -> Self {
         Self {
             rows,
@@ -36,11 +56,10 @@ impl<T: Num + NumAssign + Signed + Float + fmt::Display + Copy+PartialEq + Debug
         if row >= self.rows {
             panic!("Row index is out of bounds.");
         }
-        
+
         let mut index = 0;
         let mut data = Vec::new();
 
-        
         index += self.columns * row;
         for i in 0..self.columns {
             data.push(self.data[index + i]);
@@ -89,7 +108,7 @@ impl<T: Num + NumAssign + Signed + Float + fmt::Display + Copy+PartialEq + Debug
         self.data[index] = data;
         return;
     }
-   
+
     pub fn set_row(&mut self, row: usize, data: Vec<T>) -> () {
         if row >= self.rows {
             panic!("Row index given is out of bounds.")
@@ -130,7 +149,7 @@ impl<T: Num + NumAssign + Signed + Float + fmt::Display + Copy+PartialEq + Debug
         index2 += self.columns * row2;
         for i in 0..self.columns {
             self.data[index2 + i] = self.data[index1 + i];
-            self.data[index1 + i] = temp[i]; 
+            self.data[index1 + i] = temp[i];
         }
     }
 
@@ -145,7 +164,6 @@ impl<T: Num + NumAssign + Signed + Float + fmt::Display + Copy+PartialEq + Debug
             self.data[column2 + (i * self.columns)] = self.data[column1 + (i * self.columns)];
             self.data[column1 + (i * self.columns)] = temp[i];
         }
-
     }
 
     pub fn get_determinant(&self) -> T {
@@ -157,22 +175,22 @@ impl<T: Num + NumAssign + Signed + Float + fmt::Display + Copy+PartialEq + Debug
             columns: self.columns,
             rows: self.rows,
             data: self.data.clone(),
-        }; 
+        };
         let mut sign = T::one();
-        
+
         for i in 0..self.columns {
             let mut pivot = *trig_matrix.get(i, i);
 
             // Assign x to next row
             let mut x = i + 1;
             while pivot.is_zero() && x < self.rows {
-               if !trig_matrix.get(x, i).is_zero() {
+                if !trig_matrix.get(x, i).is_zero() {
                     trig_matrix.exchange_rows(x, i);
                     sign = -sign;
                     pivot = *trig_matrix.get(i, i);
                     break;
-               }
-               x += 1;
+                }
+                x += 1;
             }
             // Restart x for exchanging columns if necessary
             x = i + 1;
@@ -191,29 +209,45 @@ impl<T: Num + NumAssign + Signed + Float + fmt::Display + Copy+PartialEq + Debug
                 return T::zero();
             }
 
-            //So, we got the pivot, now we evaluate to 0 to create the 
+            //So, we got the pivot, now we evaluate to 0 to create the
             //triangular matrix
             x = i + 1;
             while x < trig_matrix.rows {
                 let m = *trig_matrix.get(x, i) / pivot;
                 println!("m = {m}");
-                let new_row = trig_matrix.get_row(x).iter().zip(trig_matrix.get_row(i).iter()).map(|(a, b)| *a - m * *b).collect::<Vec<T>>();
+                let new_row = trig_matrix
+                    .get_row(x)
+                    .iter()
+                    .zip(trig_matrix.get_row(i).iter())
+                    .map(|(a, b)| *a - m * *b)
+                    .collect::<Vec<T>>();
                 trig_matrix.set_row(x, new_row);
                 x += 1;
             }
         }
 
         // YES, now we got ourselves a triangular matrix, now we just
-        // take the product of the diagonal and multiply by sign, that's 
+        // take the product of the diagonal and multiply by sign, that's
         // the determinant :)
         println!("{trig_matrix}");
-        let determinant = sign * trig_matrix.get_diagonal().iter().copied().product::<T>(); 
+        let determinant = sign * trig_matrix.get_diagonal().iter().copied().product::<T>();
 
         return determinant;
     }
 }
 
-impl<T: Num + NumAssign + Signed + Float + fmt::Display + Copy+PartialEq + Debug + std::iter::Product<T>> Add for Matrix<T> {
+impl<
+        T: Num
+            + NumAssign
+            + Signed
+            + Float
+            + fmt::Display
+            + Copy
+            + PartialEq
+            + Debug
+            + std::iter::Product<T>,
+    > Add for Matrix<T>
+{
     type Output = Self;
 
     fn add(self, other: Self) -> Self::Output {
@@ -234,7 +268,18 @@ impl<T: Num + NumAssign + Signed + Float + fmt::Display + Copy+PartialEq + Debug
     }
 }
 
-impl<T: Num + NumAssign + Signed + Float + fmt::Display + Copy+PartialEq + Debug + std::iter::Product<T>> Sub for Matrix<T> {
+impl<
+        T: Num
+            + NumAssign
+            + Signed
+            + Float
+            + fmt::Display
+            + Copy
+            + PartialEq
+            + Debug
+            + std::iter::Product<T>,
+    > Sub for Matrix<T>
+{
     type Output = Self;
 
     fn sub(self, other: Self) -> Self::Output {
@@ -255,14 +300,25 @@ impl<T: Num + NumAssign + Signed + Float + fmt::Display + Copy+PartialEq + Debug
     }
 }
 
-impl<T: Num + NumAssign + Signed + Float + fmt::Display + Copy+PartialEq + Debug + std::iter::Product<T>> Mul for Matrix<T> {
+impl<
+        T: Num
+            + NumAssign
+            + Signed
+            + Float
+            + fmt::Display
+            + Copy
+            + PartialEq
+            + Debug
+            + std::iter::Product<T>,
+    > Mul for Matrix<T>
+{
     type Output = Self;
 
     fn mul(self, other: Self) -> Self::Output {
         if self.columns != other.rows {
             panic!("Matrix dimentions are inadecuate.");
         }
-        
+
         let mut new_data: Vec<T> = Vec::new();
         for i in 0..self.rows {
             let current_row = self.get_row(i);
@@ -281,11 +337,22 @@ impl<T: Num + NumAssign + Signed + Float + fmt::Display + Copy+PartialEq + Debug
             rows: self.rows,
             columns: other.columns,
             data: new_data,
-        }    
-    }   
+        }
+    }
 }
 
-impl<T: Num + NumAssign + Signed + Float + fmt::Display + Copy+PartialEq + Debug + std::iter::Product<T>> fmt::Display for Matrix<T> {
+impl<
+        T: Num
+            + NumAssign
+            + Signed
+            + Float
+            + fmt::Display
+            + Copy
+            + PartialEq
+            + Debug
+            + std::iter::Product<T>,
+    > fmt::Display for Matrix<T>
+{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut display = String::new();
         let mut index = 0;
@@ -321,7 +388,7 @@ mod tests {
         let mut matrix1 = Matrix::new(4, 4, 2.0);
         let mut matrix2 = Matrix::new(4, 4, 0.0);
         let mut result_matrix = Matrix::new(4, 4, 2.0);
-    
+
         result_matrix.set(0, 0, 9.0);
         matrix2.set(0, 0, 7.0);
         matrix1 = matrix1 + matrix2;
@@ -379,7 +446,7 @@ mod tests {
         matrix1.set(0, 2, 9.0);
         matrix1.set(0, 3, 6.0);
 
-        let data = vec![8.0, 7.0 , 9.0, 6.0];
+        let data = vec![8.0, 7.0, 9.0, 6.0];
 
         assert_eq!(matrix1.get_row(0), data);
     }
@@ -387,7 +454,7 @@ mod tests {
     #[test]
     fn get_row_2() {
         let mut matrix1 = Matrix::new(3, 4, 0.0);
-        
+
         matrix1.set(2, 0, 8.0);
         matrix1.set(2, 1, 7.0);
         matrix1.set(2, 2, 9.0);
@@ -406,7 +473,7 @@ mod tests {
         let _data = matrix1.get_row(4);
     }
 
-     #[test]
+    #[test]
     fn get_column_1() {
         let mut matrix1 = Matrix::new(4, 3, 0.0);
         matrix1.set(0, 0, 8.0);
@@ -414,7 +481,7 @@ mod tests {
         matrix1.set(2, 0, 9.0);
         matrix1.set(3, 0, 6.0);
 
-        let data = vec![8.0, 7.0 , 9.0, 6.0];
+        let data = vec![8.0, 7.0, 9.0, 6.0];
 
         assert_eq!(matrix1.get_column(0), data);
     }
@@ -422,7 +489,7 @@ mod tests {
     #[test]
     fn get_column_2() {
         let mut matrix1 = Matrix::new(4, 3, 0.0);
-        
+
         matrix1.set(0, 2, 8.0);
         matrix1.set(1, 2, 7.0);
         matrix1.set(2, 2, 9.0);
@@ -474,7 +541,7 @@ mod tests {
         matrix1.set(3, 1, 2.0);
         matrix1.set(3, 2, 2.0);
         matrix1.set(3, 3, 9.0);
-        
+
         matrix2.set(0, 0, 7.0);
         matrix2.set(0, 1, 6.0);
         matrix2.set(0, 2, 1.0);
@@ -526,7 +593,7 @@ mod tests {
         assert_eq!(row1, matrix.get_row(1));
         assert_eq!(row2, matrix.get_row(0));
     }
-    
+
     #[test]
     fn exchange_rows_2() {
         let mut matrix = Matrix::new(3, 4, 5.0);
@@ -547,7 +614,7 @@ mod tests {
         assert_eq!(row1, matrix.get_row(2));
         assert_eq!(row2, matrix.get_row(0));
     }
-    
+
     #[test]
     fn exchange_columns_1() {
         let mut matrix = Matrix::new(3, 4, 5.0);
@@ -591,7 +658,7 @@ mod tests {
         let mut matrix = Matrix::new(3, 4, 5.0);
         let vec1 = vec![1.0, 2.0, 3.0, 4.0];
         matrix.set_row(0, vec1);
-        
+
         let vec2 = vec![1.0, 2.0, 3.0, 4.0];
         let row = matrix.get_row(0);
         assert_eq!(row, vec2);
