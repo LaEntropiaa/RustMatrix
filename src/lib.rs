@@ -214,7 +214,6 @@ impl<
             x = i + 1;
             while x < trig_matrix.rows {
                 let m = *trig_matrix.get(x, i) / pivot;
-                println!("m = {m}");
                 let new_row = trig_matrix
                     .get_row(x)
                     .iter()
@@ -229,7 +228,6 @@ impl<
         // YES, now we got ourselves a triangular matrix, now we just
         // take the product of the diagonal and multiply by sign, that's
         // the determinant :)
-        println!("{trig_matrix}");
         let determinant = sign * trig_matrix.get_diagonal().iter().copied().product::<T>();
 
         return determinant;
