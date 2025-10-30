@@ -744,4 +744,26 @@ mod tests {
 
         assert_eq!(matrix.get_determinant(), 0.0);
     }
+
+    #[test]
+    fn get_determinant_3() {
+        let mut matrix = Matrix::new(3, 3, 0.0);
+        matrix.set(0, 0, 0.0);
+        matrix.set(1, 0, 1.0);
+        matrix.set(2, 0, 2.0);
+        matrix.set(0, 1, 2.0);
+        matrix.set(1, 1, 3.0);
+        matrix.set(2, 1, 1.0);
+        matrix.set(0, 2, 1.0);
+        matrix.set(1, 2, 4.0);
+        matrix.set(2, 2, 3.0);
+
+        assert_eq!(matrix.get_determinant(), 5.0);
+    }
+
+    #[test]
+    fn get_determinant_4() {
+        let mut matrix = Matrix::new(3, 3, 0.0);
+
+    }
 }
