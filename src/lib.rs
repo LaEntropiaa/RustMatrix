@@ -192,17 +192,6 @@ impl<
                 }
                 x += 1;
             }
-            // Restart x for exchanging columns if necessary
-            x = i + 1;
-            while pivot.is_zero() && x < self.columns {
-                if !trig_matrix.get(i, x).is_zero() {
-                    trig_matrix.exchange_columns(i, x);
-                    sign = -sign;
-                    pivot = *trig_matrix.get(i, i);
-                    break;
-                }
-                x += 1;
-            }
             // If even exchanging in all ways posible pivot is still 0
             // then determinant is 0
             if pivot.is_zero() {
@@ -764,6 +753,16 @@ mod tests {
     #[test]
     fn get_determinant_4() {
         let mut matrix = Matrix::new(3, 3, 0.0);
+        matrix.set(0, 0, 2.0);
+        matrix.set(1, 0, 0.0);
+        matrix.set(2, 0, 1.0);
+        matrix.set(0, 1, 3.0);
+        matrix.set(1, 1, 4.0);
+        matrix.set(2, 1, 0.0);
+        matrix.set(0, 2, 5.0);
+        matrix.set(1, 2, 1.0);
+        matrix.set(2, 2, 6.0);
 
+        assert_eq!(matrix.get_determinant(), 31.0);
     }
 }
